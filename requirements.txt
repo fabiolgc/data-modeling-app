@@ -1,0 +1,6 @@
+streamlit==1.31.0
+streamlit-agraph==0.0.45
+pandas==2.1.4
+plotly==5.18.0
+pydantic==2.5.3
+

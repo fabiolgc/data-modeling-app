@@ -1,0 +1,19 @@
+Criar uma aplicação para modelagem de dados; 
+Esta aplicação será executada no Databricks Apps; 
+Use a documentação do Databricks App e Cookbook de Apps para referência;
+Defina o melhor framework suportado pelo databricks apps;
+Na documentação explore os sublinks onde há informações de extrutura de arquivos, conexão de dados, etc.
+Essa aplicação deve permitir os usuários realizarem a modelagem de dados graficamente, no-code, por exemplo, quando for criar uma nova tabela, ele adiciona uma caixa, DAG, define o nome, adiciona campos, tipo do dado, descrição, chave primária, chave estrangeira e tag. 
+As caixas que representam tabelas podem se relacionar entre si, como relacionamento de bancos de dados. Estes relacionamentos podem ser 1 pra 1, 1 para muitos, muitos para 1, muitos para muitos, etc. 
+O relacionamento entre as tabelas, caixas (DAG), devem aparecem como linhas;
+Para criar as caixas graficamente você pode usar a biblioteca https://mermaid.js.org/ ou outra similar, que seja poupular e ou tenha boas referências de uso, comentários de usuários e estrelas no GitHub; Deve ser open-source;
+Na parte central da tela deve ser o painel onde serão criadas as tabelas, DAGs, os relacionamentos, etc. Quando clicar em uma tabela, uma DAG, deve abrir um painel na lateral direita com os detalhes de nome da tabela, campos, tipos de dados, descrições e tags de cada campo; Através deste painel de detalhe deve ser possível alterar as informações, configurações da tabela e salvar; As alterações devem refletir no painel gráfico, nas caixas das tabelas e seus relacionamento;
+No painel deve ser possivel aplicar Zoom para mais ou Zoom para menos, organizar o diagrama de relacionamento das tabelas e centralizar o diagrama na tela;  
+Ao final deve ser possível salvar o diagrama; Deve ser possível exportar um diagrama gerado em formato JSON e deve ser possível importar um diagrama criado anteriormente no mesmo formato JSON; Esse arquivo JSON representará o Diagrama e suas configurações;
+Deve ser possivel Gerar o código SQL DDL para criar as tabelas no Databricks DBSQL;
+
+- Documentação Databricks Apps:https://docs.databricks.com/aws/pt/dev-tools/databricks-apps
+- Documentação Cookbook: https://apps-cookbook.dev/  
+- Documentação da Lib mermaid:https://mermaid.js.org/intro/ 
+
+

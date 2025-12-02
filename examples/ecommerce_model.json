@@ -1,0 +1,254 @@
+{
+  "metadata": {
+    "name": "E-commerce Data Model",
+    "version": "1.0",
+    "description": "Modelo de dados para sistema de e-commerce"
+  },
+  "tables": {
+    "customers": {
+      "name": "customers",
+      "description": "Tabela de clientes do e-commerce",
+      "fields": [
+        {
+          "name": "customer_id",
+          "data_type": "BIGINT",
+          "description": "ID único do cliente",
+          "is_primary_key": true,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["pii", "key"]
+        },
+        {
+          "name": "email",
+          "data_type": "STRING",
+          "description": "Email do cliente",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["pii", "contact"]
+        },
+        {
+          "name": "first_name",
+          "data_type": "STRING",
+          "description": "Primeiro nome",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["pii"]
+        },
+        {
+          "name": "last_name",
+          "data_type": "STRING",
+          "description": "Sobrenome",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["pii"]
+        },
+        {
+          "name": "created_at",
+          "data_type": "TIMESTAMP",
+          "description": "Data de criação do registro",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["audit"]
+        }
+      ],
+      "position_x": 100,
+      "position_y": 100
+    },
+    "orders": {
+      "name": "orders",
+      "description": "Pedidos realizados pelos clientes",
+      "fields": [
+        {
+          "name": "order_id",
+          "data_type": "BIGINT",
+          "description": "ID único do pedido",
+          "is_primary_key": true,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["key"]
+        },
+        {
+          "name": "customer_id",
+          "data_type": "BIGINT",
+          "description": "ID do cliente que fez o pedido",
+          "is_primary_key": false,
+          "is_foreign_key": true,
+          "is_nullable": false,
+          "tags": ["foreign_key"]
+        },
+        {
+          "name": "order_date",
+          "data_type": "TIMESTAMP",
+          "description": "Data do pedido",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["business"]
+        },
+        {
+          "name": "total_amount",
+          "data_type": "DECIMAL",
+          "description": "Valor total do pedido",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["financial"]
+        },
+        {
+          "name": "status",
+          "data_type": "STRING",
+          "description": "Status do pedido",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["business"]
+        }
+      ],
+      "position_x": 400,
+      "position_y": 100
+    },
+    "order_items": {
+      "name": "order_items",
+      "description": "Itens de cada pedido",
+      "fields": [
+        {
+          "name": "order_item_id",
+          "data_type": "BIGINT",
+          "description": "ID único do item",
+          "is_primary_key": true,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["key"]
+        },
+        {
+          "name": "order_id",
+          "data_type": "BIGINT",
+          "description": "ID do pedido",
+          "is_primary_key": false,
+          "is_foreign_key": true,
+          "is_nullable": false,
+          "tags": ["foreign_key"]
+        },
+        {
+          "name": "product_id",
+          "data_type": "BIGINT",
+          "description": "ID do produto",
+          "is_primary_key": false,
+          "is_foreign_key": true,
+          "is_nullable": false,
+          "tags": ["foreign_key"]
+        },
+        {
+          "name": "quantity",
+          "data_type": "INT",
+          "description": "Quantidade do produto",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["business"]
+        },
+        {
+          "name": "unit_price",
+          "data_type": "DECIMAL",
+          "description": "Preço unitário",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["financial"]
+        }
+      ],
+      "position_x": 400,
+      "position_y": 350
+    },
+    "products": {
+      "name": "products",
+      "description": "Catálogo de produtos",
+      "fields": [
+        {
+          "name": "product_id",
+          "data_type": "BIGINT",
+          "description": "ID único do produto",
+          "is_primary_key": true,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["key"]
+        },
+        {
+          "name": "name",
+          "data_type": "STRING",
+          "description": "Nome do produto",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["business"]
+        },
+        {
+          "name": "description",
+          "data_type": "STRING",
+          "description": "Descrição do produto",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": true,
+          "tags": ["business"]
+        },
+        {
+          "name": "category",
+          "data_type": "STRING",
+          "description": "Categoria do produto",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["business", "classification"]
+        },
+        {
+          "name": "price",
+          "data_type": "DECIMAL",
+          "description": "Preço do produto",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["financial"]
+        },
+        {
+          "name": "stock_quantity",
+          "data_type": "INT",
+          "description": "Quantidade em estoque",
+          "is_primary_key": false,
+          "is_foreign_key": false,
+          "is_nullable": false,
+          "tags": ["inventory"]
+        }
+      ],
+      "position_x": 700,
+      "position_y": 350
+    }
+  },
+  "relationships": [
+    {
+      "from_table": "orders",
+      "to_table": "customers",
+      "relationship_type": "N:1",
+      "from_field": "customer_id",
+      "to_field": "customer_id"
+    },
+    {
+      "from_table": "order_items",
+      "to_table": "orders",
+      "relationship_type": "N:1",
+      "from_field": "order_id",
+      "to_field": "order_id"
+    },
+    {
+      "from_table": "order_items",
+      "to_table": "products",
+      "relationship_type": "N:1",
+      "from_field": "product_id",
+      "to_field": "product_id"
+    }
+  ]
+}
+
