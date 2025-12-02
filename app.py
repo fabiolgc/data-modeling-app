@@ -355,20 +355,46 @@ with detail_col:
             
             st.divider()
             
-            # Listar campos existentes
+            # Listar campos existentes usando st.table
             if table.fields:
                 st.markdown("**Campos Existentes**")
+                
+                # Criar DataFrame para exibir em tabela
+                import pandas as pd
+                
+                table_data = []
+                for field in table.fields:
+                    # PK/FK
+                    pk_fk = ""
+                    if field.is_primary_key:
+                        pk_fk = "🔑 PK"
+                    elif field.is_foreign_key:
+                        pk_fk = "🔗 FK"
+                    
+                    # Null
+                    nullable = "" if field.is_nullable else "NOT NULL"
+                    
+                    table_data.append({
+                        "PK/FK": pk_fk,
+                        "Campo": field.name,
+                        "Tipo": field.data_type,
+                        "Null": nullable,
+                        "Descrição": field.description or ""
+                    })
+                
+                # Criar DataFrame
+                df_fields = pd.DataFrame(table_data)
+                
+                # Exibir tabela sem índice
+                st.table(df_fields)
+                
+                # Botões de ação para cada campo
+                st.markdown("**Ações**")
                 for idx, field in enumerate(table.fields):
                     field_id = f"{table.name}_{field.name}"
-                    
-                    # Mostrar campo
-                    col_info, col_del = st.columns([4, 1])
-                    with col_info:
-                        pk_badge = "🔑" if field.is_primary_key else ""
-                        fk_badge = "🔗" if field.is_foreign_key else ""
-                        st.markdown(f"{pk_badge}{fk_badge} **{field.name}** `{field.data_type}`")
-                        if field.description:
-                            st.caption(field.description)
+                    col_field, col_del = st.columns([4, 1])
+                    with col_field:
+                        st.caption(f"• {field.name}")
                     with col_del:
                         if st.button("🗑️", key=f"del_field_{field_id}", help="Remover campo"):
                             table.remove_field(field.name)
