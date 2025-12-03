@@ -3,7 +3,7 @@ Renderizador de diagramas usando Mermaid
 """
 
 import streamlit as st
-from streamlit_mermaid import st_mermaid
+import streamlit.components.v1 as components
 from models import DataModel, Table, RelationshipType, Relationship
 from typing import Optional, Dict, List
 
@@ -101,16 +101,63 @@ def render_diagram(
     # Gerar código Mermaid
     mermaid_code = create_mermaid_erd(model, config)
     
-    # Renderizar usando streamlit-mermaid
+    # Renderizar usando HTML customizado (sem controles de zoom/reset)
     try:
-        st_mermaid(
-            mermaid_code,
-            height=600,
-            key="data_model_diagram"
-        )
+        html_code = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <style>
+                body {{
+                    margin: 0;
+                    padding: 20px;
+                    background-color: #121212;
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
+                    min-height: 100vh;
+                }}
+                .mermaid {{
+                    background-color: transparent;
+                }}
+                /* Ocultar controles de zoom/reset */
+                svg > g > g:first-of-type {{
+                    display: none !important;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="mermaid">
+{mermaid_code}
+            </div>
+            <script>
+                mermaid.initialize({{
+                    startOnLoad: true,
+                    theme: 'dark',
+                    themeVariables: {{
+                        primaryColor: '#1DB954',
+                        primaryTextColor: '#fff',
+                        primaryBorderColor: '#1DB954',
+                        lineColor: '#1DB954',
+                        secondaryColor: '#282828',
+                        tertiaryColor: '#121212'
+                    }},
+                    er: {{
+                        useMaxWidth: true
+                    }}
+                }});
+            </script>
+        </body>
+        </html>
+        """
+        
+        components.html(html_code, height=600, scrolling=True)
+        
     except Exception as e:
         st.error(f"Erro ao renderizar diagrama: {str(e)}")
         st.code(mermaid_code, language="mermaid")
+        st.info("💡 Dica: O código Mermaid acima pode ser copiado e usado em documentação.")
     
     # Mermaid ERD não suporta seleção interativa nativamente
     return None

@@ -116,9 +116,9 @@ Referência completa: https://docs.streamlit.io/develop/concepts/configuration/t
 
 ## 📦 Dependências
 
-- `streamlit >= 1.30.0` - Framework web
-- `streamlit-mermaid >= 1.0.0` - Diagramas ERD com Mermaid
+- `streamlit >= 1.30.0` - Framework web (com components.html para Mermaid)
 - `pandas` - Manipulação de dados
+- Mermaid.js via CDN (carregado automaticamente)
 
 ## 🔧 Desenvolvimento
 

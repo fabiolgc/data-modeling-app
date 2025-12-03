@@ -65,6 +65,38 @@ st.markdown("""
         padding: 1rem;
         background-color: rgba(18, 18, 18, 0.5);
     }
+    
+    /* Ocultar controles de zoom/reset do Mermaid */
+    .mermaid-controls,
+    .mermaid svg .reset,
+    .mermaid .zoom-controls,
+    svg .zoom-button,
+    svg .reset-button,
+    svg g[class*="zoom"],
+    svg g[class*="reset"],
+    svg g > g > g:first-child,
+    svg > g > g:first-child {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    /* Ocultar elementos de controle dentro do iframe do Mermaid */
+    iframe {
+        pointer-events: auto !important;
+    }
+    
+    /* Forçar ocultar grupo de controles no SVG */
+    svg > g > g:first-of-type > rect[fill="#f2f2f2"],
+    svg > g > g:first-of-type > text {
+        display: none !important;
+    }
+    
+    /* Esconder qualquer rect ou text que pareça ser um botão */
+    svg g[transform] > rect[rx="5"],
+    svg g[transform] > text[text-anchor="middle"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
