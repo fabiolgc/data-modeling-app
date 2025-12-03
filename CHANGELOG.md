@@ -7,11 +7,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### 🎨 Mudança: Migração para Mermaid ERD
 
 #### Adicionado
-- **Mermaid ERD**: Substituído `streamlit-agraph` por `streamlit-mermaid`
+- **Mermaid ERD**: Substituído `streamlit-agraph` por renderização HTML customizada com Mermaid
 - **Diagramas padrão**: ERD (Entity Relationship Diagram) com sintaxe Mermaid
 - **Campos nos relacionamentos**: Labels mostram os campos relacionados (ex: `id:cliente_id`)
 - **Seletor de campos**: UI para especificar quais campos se relacionam
 - **Sintaxe universal**: Código Mermaid pode ser usado em docs, GitHub, etc.
+- **Controles de Zoom Customizados**: Botões +/- e reset no canto inferior direito
+- **Zoom com Mouse**: Ctrl + scroll para zoom suave
+- **Tamanho Otimizado**: Diagrama inicia em 60% para objetos menores
 
 #### Modificado
 - ✏️ **diagram_renderer.py**: Reescrito para gerar sintaxe Mermaid ERD

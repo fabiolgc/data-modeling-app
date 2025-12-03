@@ -118,32 +118,138 @@ def render_diagram(
                     margin: 0;
                     padding: 10px;
                     background-color: #121212;
-                    display: flex;
-                    justify-content: center;
-                    align-items: flex-start;
-                    min-height: 100vh;
+                    overflow: hidden;
+                    position: relative;
+                }}
+                #diagram-container {{
+                    width: 100%;
+                    height: 100vh;
                     overflow: auto;
+                    position: relative;
                 }}
                 .mermaid {{
                     background-color: transparent;
-                    width: 100%;
-                    max-width: 100%;
+                    transform-origin: center center;
+                    transition: transform 0.3s ease;
+                    display: inline-block;
+                    min-width: 100%;
                 }}
                 svg {{
-                    max-width: 100% !important;
+                    max-width: none !important;
                     height: auto !important;
+                    display: block;
                 }}
-                /* Ocultar controles de zoom/reset */
+                /* Ocultar controles padrão de zoom/reset */
                 svg > g > g:first-of-type {{
                     display: none !important;
+                }}
+                
+                /* Controles de Zoom Customizados */
+                .zoom-controls {{
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    z-index: 1000;
+                }}
+                .zoom-btn {{
+                    width: 40px;
+                    height: 40px;
+                    background-color: #1DB954;
+                    border: none;
+                    border-radius: 8px;
+                    color: white;
+                    font-size: 20px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+                    transition: all 0.2s;
+                }}
+                .zoom-btn:hover {{
+                    background-color: #1ED760;
+                    transform: scale(1.1);
+                }}
+                .zoom-btn:active {{
+                    transform: scale(0.95);
+                }}
+                .zoom-level {{
+                    width: 40px;
+                    height: 30px;
+                    background-color: #282828;
+                    border: 1px solid #1DB954;
+                    border-radius: 4px;
+                    color: white;
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
                 }}
             </style>
         </head>
         <body>
-            <div class="mermaid">
+            <div id="diagram-container">
+                <div class="mermaid" id="mermaid-diagram">
 {mermaid_code}
+                </div>
             </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                <div class="zoom-level" id="zoom-level">100%</div>
+                <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+                <button class="zoom-btn" onclick="resetZoom()" title="Reset">⟲</button>
+            </div>
+            
             <script>
+                let currentZoom = 0.6;  // Começar com 60% (menor)
+                const zoomStep = 0.1;
+                const minZoom = 0.3;
+                const maxZoom = 2.0;
+                
+                function updateZoom() {{
+                    const diagram = document.getElementById('mermaid-diagram');
+                    diagram.style.transform = `scale(${{currentZoom}})`;
+                    document.getElementById('zoom-level').textContent = Math.round(currentZoom * 100) + '%';
+                }}
+                
+                function zoomIn() {{
+                    if (currentZoom < maxZoom) {{
+                        currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                        updateZoom();
+                    }}
+                }}
+                
+                function zoomOut() {{
+                    if (currentZoom > minZoom) {{
+                        currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                        updateZoom();
+                    }}
+                }}
+                
+                function resetZoom() {{
+                    currentZoom = 0.6;
+                    updateZoom();
+                    document.getElementById('diagram-container').scrollTo(0, 0);
+                }}
+                
+                // Zoom com scroll do mouse
+                document.getElementById('diagram-container').addEventListener('wheel', function(e) {{
+                    if (e.ctrlKey) {{
+                        e.preventDefault();
+                        if (e.deltaY < 0) {{
+                            zoomIn();
+                        }} else {{
+                            zoomOut();
+                        }}
+                    }}
+                }}, {{ passive: false }});
+                
+                // Inicializar Mermaid
                 mermaid.initialize({{
                     startOnLoad: true,
                     theme: 'dark',
@@ -153,19 +259,26 @@ def render_diagram(
                         primaryBorderColor: '#1DB954',
                         lineColor: '#1DB954',
                         secondaryColor: '#282828',
-                        tertiaryColor: '#121212'
+                        tertiaryColor: '#121212',
+                        fontSize: '14px'
                     }},
                     er: {{
-                        useMaxWidth: true,
-                        diagramPadding: 10
+                        useMaxWidth: false,
+                        diagramPadding: 20,
+                        layoutDirection: 'TB'
                     }}
                 }});
+                
+                // Aplicar zoom inicial
+                setTimeout(() => {{
+                    updateZoom();
+                }}, 100);
             </script>
         </body>
         </html>
         """
         
-        components.html(html_code, height=600, scrolling=True)
+        components.html(html_code, height=650, scrolling=False)
         
     except Exception as e:
         st.error(f"Erro ao renderizar diagrama: {str(e)}")

@@ -78,6 +78,9 @@ A aplicação será aberta automaticamente no navegador em `http://localhost:850
 - **Relacionamentos claros**: Símbolos padrão (|o--o|, |o--o{, etc.)
 - **Labels informativos**: Tipo de relação e campos relacionados
 - **Exportável**: Código Mermaid pode ser usado em documentação
+- **Controles de Zoom**: Botões +/- e reset no canto inferior direito
+- **Zoom com Mouse**: Ctrl + scroll para zoom suave
+- **Tamanho Otimizado**: Inicia em 60% para melhor visualização
 
 ## 🎯 Diferenças da versão anterior
 
