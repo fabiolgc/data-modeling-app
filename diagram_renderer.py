@@ -26,99 +26,72 @@ def get_relationship_label(rel_type: RelationshipType) -> str:
 
 def create_table_label(table: Table) -> str:
     """
-    Cria o label para uma tabela em formato tabular alinhado
-    Formato:
-    - PK/FK: 5 chars (alinhado direita) + 5 espaços = 10 posições
-    - CAMPO: 45 chars (alinhado esquerda)
-    - TIPO: 20 chars (alinhado esquerda)
-    - NULL: 5 chars (alinhado esquerda)
-    Total: 80 caracteres por linha
+    Cria o label para uma tabela usando HTML table
+    Formato de tabela com bordas, similar ao st.table do Streamlit
     """
     # Limita o número de campos mostrados no diagrama
     max_fields = 8
     fields_to_show = table.fields[:max_fields]
     
-    fields_lines = []
+    # Começar HTML
+    html = f'<div style="font-family: monospace; font-size: 12px; color: #FFFFFF;">'
     
-    # Larguras conforme especificado
-    w_pk_fk = 5      # PK/FK (alinhado direita)
-    w_spacing = 5    # Espaçamento após PK/FK
-    w_campo = 45     # Campo
-    w_tipo = 20      # Tipo
-    w_null = 5       # Null
+    # Nome da tabela
+    html += f'<div style="font-weight: bold; font-size: 14px; margin-bottom: 5px; padding: 5px; background-color: rgba(0,0,0,0.3);">{table.name.upper()}</div>'
     
-    # Total
-    total_width = w_pk_fk + w_spacing + w_campo + w_tipo + w_null
-    separator = "-" * total_width
+    # Tabela HTML
+    html += '<table style="width: 100%; border-collapse: collapse; background-color: rgba(0,0,0,0.5);">'
     
-    # Cabeçalho: PK/FK + 5 espaços + CAMPO + 45 espaços + TIPO + 20 espaços + NULL
-    h1 = "PK/FK" + " " * (w_pk_fk - len("PK/FK"))  # PK/FK com padding
-    h1 += " " * w_spacing                           # 5 espaços
-    h2 = "CAMPO" + " " * (w_campo - len("CAMPO"))   # CAMPO com padding
-    h3 = "TIPO" + " " * (w_tipo - len("TIPO"))      # TIPO com padding
-    h4 = "NULL" + " " * (w_null - len("NULL"))      # NULL com padding
-    header = h1 + h2 + h3 + h4
+    # Cabeçalho
+    html += '<tr style="background-color: rgba(0,0,0,0.7); font-weight: bold;">'
+    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: right; width: 15%;">PK/FK</th>'
+    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: left; width: 35%;">Campo</th>'
+    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: left; width: 30%;">Tipo</th>'
+    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: center; width: 20%;">Null</th>'
+    html += '</tr>'
     
+    # Linhas de campos
     for field in fields_to_show:
-        # Coluna 1: PK/FK - 5 caracteres alinhado à DIREITA
+        html += '<tr>'
+        
+        # PK/FK
+        pk_fk = ""
         if field.is_primary_key:
-            pk_fk_text = "PK"
+            pk_fk = "🔑 PK"
         elif field.is_foreign_key:
-            pk_fk_text = "FK"
-        else:
-            pk_fk_text = ""
-        # Alinhar à direita preenchendo à esquerda com espaços
-        c1 = " " * (w_pk_fk - len(pk_fk_text)) + pk_fk_text
-        # Adicionar 5 espaços após PK/FK
-        c1 += " " * w_spacing
+            pk_fk = "🔗 FK"
+        html += f'<td style="border: 1px solid #555; padding: 4px 8px; text-align: right;">{pk_fk}</td>'
         
-        # Coluna 2: Nome do campo - 45 caracteres alinhado à ESQUERDA
-        if len(field.name) > 42:
-            campo_text = field.name[:42] + "..."  # Truncar e adicionar "..."
-        else:
-            campo_text = field.name
-        c2 = campo_text + " " * (w_campo - len(campo_text))
+        # Campo (truncar se muito longo)
+        campo = field.name[:25] + "..." if len(field.name) > 25 else field.name
+        html += f'<td style="border: 1px solid #555; padding: 4px 8px;">{campo}</td>'
         
-        # Coluna 3: Tipo - 20 caracteres alinhado à ESQUERDA
-        if len(field.data_type) > 17:
-            tipo_text = field.data_type[:17] + "..."  # Truncar e adicionar "..."
-        else:
-            tipo_text = field.data_type
-        c3 = tipo_text + " " * (w_tipo - len(tipo_text))
+        # Tipo (truncar se muito longo)
+        tipo = field.data_type[:15] + "..." if len(field.data_type) > 15 else field.data_type
+        html += f'<td style="border: 1px solid #555; padding: 4px 8px;">{tipo}</td>'
         
-        # Coluna 4: NULL - 5 caracteres alinhado à ESQUERDA
-        if field.is_nullable:
-            c4 = " " * w_null  # Vazio para nullable
-        else:
-            null_text = "NO"  # "NO" para NOT NULL (cabe em 5 chars)
-            c4 = null_text + " " * (w_null - len(null_text))
+        # Null
+        nullable = "" if field.is_nullable else "NOT NULL"
+        html += f'<td style="border: 1px solid #555; padding: 4px 8px; text-align: center; font-size: 10px;">{nullable}</td>'
         
-        # Linha completa
-        line = c1 + c2 + c3 + c4
-        fields_lines.append(line)
+        html += '</tr>'
     
     # Indicador de mais campos
     if len(table.fields) > max_fields:
-        more = f"... +{len(table.fields) - max_fields} campos"
-        spacing = " " * (w_pk_fk + w_spacing)
-        fields_lines.append(spacing + more)
+        html += '<tr>'
+        html += f'<td colspan="4" style="border: 1px solid #555; padding: 4px 8px; text-align: center; font-style: italic;">... +{len(table.fields) - max_fields} campos</td>'
+        html += '</tr>'
     
     # Placeholder se não houver campos
-    if not fields_lines:
-        spacing = " " * (w_pk_fk + w_spacing)
-        fields_lines.append(spacing + "(nenhum campo)")
+    if not fields_to_show:
+        html += '<tr>'
+        html += '<td colspan="4" style="border: 1px solid #555; padding: 8px; text-align: center; font-style: italic;">(nenhum campo)</td>'
+        html += '</tr>'
     
-    # Construir label completo
-    label_parts = [
-        table.name.upper(),
-        separator,
-        header,
-        separator,
-        *fields_lines
-    ]
+    html += '</table>'
+    html += '</div>'
     
-    label = "\n".join(label_parts)
-    return label
+    return html
 
 
 def render_diagram(
@@ -143,7 +116,7 @@ def render_diagram(
         node = Node(
             id=table_name,
             label=create_table_label(table),
-            size=680,
+            size=500,
             color={
                 "background": color,
                 "border": border_color,
@@ -154,10 +127,10 @@ def render_diagram(
             },
             shape="box",
             font={
-                "size": 13, 
+                "size": 12, 
                 "color": "#FFFFFF", 
-                "face": "Consolas, Monaco, 'Courier New', monospace",  # Fontes monoespaçadas
-                "multi": "html", 
+                "face": "Arial, sans-serif",
+                "multi": "html",  # Habilita suporte a HTML
                 "align": "left",
                 "vadjust": 0
             },
@@ -165,8 +138,9 @@ def render_diagram(
             y=table.position_y * config['zoom'],
             borderWidth=2,
             borderWidthSelected=3,
-            widthConstraint={"minimum": 680, "maximum": 680},
-            margin={"top": 12, "bottom": 12, "left": 18, "right": 18}
+            widthConstraint={"minimum": 500, "maximum": 500},
+            heightConstraint={"minimum": 150},
+            margin={"top": 8, "bottom": 8, "left": 8, "right": 8}
         )
         nodes.append(node)
     
