@@ -26,72 +26,79 @@ def get_relationship_label(rel_type: RelationshipType) -> str:
 
 def create_table_label(table: Table) -> str:
     """
-    Cria o label para uma tabela usando HTML table
-    Formato de tabela com bordas, similar ao st.table do Streamlit
+    Cria o label para uma tabela em formato de texto com bordas usando caracteres box-drawing
+    Simula uma tabela com bordas visíveis
     """
     # Limita o número de campos mostrados no diagrama
     max_fields = 8
     fields_to_show = table.fields[:max_fields]
     
-    # Começar HTML
-    html = f'<div style="font-family: monospace; font-size: 12px; color: #FFFFFF;">'
+    # Larguras das colunas
+    w_pk = 8      # PK/FK
+    w_campo = 20  # Campo
+    w_tipo = 12   # Tipo
+    w_null = 8    # Null
+    
+    lines = []
     
     # Nome da tabela
-    html += f'<div style="font-weight: bold; font-size: 14px; margin-bottom: 5px; padding: 5px; background-color: rgba(0,0,0,0.3);">{table.name.upper()}</div>'
+    lines.append(f"┌{'─' * (w_pk + w_campo + w_tipo + w_null + 6)}┐")
+    lines.append(f"│ {table.name.upper():^{w_pk + w_campo + w_tipo + w_null + 4}} │")
     
-    # Tabela HTML
-    html += '<table style="width: 100%; border-collapse: collapse; background-color: rgba(0,0,0,0.5);">'
+    # Linha separadora após o nome
+    lines.append(f"├{'─' * w_pk}┬{'─' * w_campo}┬{'─' * w_tipo}┬{'─' * w_null}┤")
     
     # Cabeçalho
-    html += '<tr style="background-color: rgba(0,0,0,0.7); font-weight: bold;">'
-    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: right; width: 15%;">PK/FK</th>'
-    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: left; width: 35%;">Campo</th>'
-    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: left; width: 30%;">Tipo</th>'
-    html += '<th style="border: 1px solid #555; padding: 4px 8px; text-align: center; width: 20%;">Null</th>'
-    html += '</tr>'
+    h1 = "PK/FK".center(w_pk)
+    h2 = "Campo".ljust(w_campo)
+    h3 = "Tipo".ljust(w_tipo)
+    h4 = "Null".center(w_null)
+    lines.append(f"│{h1}│{h2}│{h3}│{h4}│")
     
-    # Linhas de campos
+    # Linha separadora após cabeçalho
+    lines.append(f"├{'─' * w_pk}┼{'─' * w_campo}┼{'─' * w_tipo}┼{'─' * w_null}┤")
+    
+    # Linhas de dados
     for field in fields_to_show:
-        html += '<tr>'
-        
-        # PK/FK
-        pk_fk = ""
+        # PK/FK - alinhado à direita
         if field.is_primary_key:
-            pk_fk = "🔑 PK"
+            pk_fk = "PK"
         elif field.is_foreign_key:
-            pk_fk = "🔗 FK"
-        html += f'<td style="border: 1px solid #555; padding: 4px 8px; text-align: right;">{pk_fk}</td>'
+            pk_fk = "FK"
+        else:
+            pk_fk = ""
+        c1 = pk_fk.rjust(w_pk)
         
-        # Campo (truncar se muito longo)
-        campo = field.name[:25] + "..." if len(field.name) > 25 else field.name
-        html += f'<td style="border: 1px solid #555; padding: 4px 8px;">{campo}</td>'
+        # Campo - truncar se necessário
+        campo = field.name[:w_campo-2] + ".." if len(field.name) > w_campo else field.name
+        c2 = campo.ljust(w_campo)
         
-        # Tipo (truncar se muito longo)
-        tipo = field.data_type[:15] + "..." if len(field.data_type) > 15 else field.data_type
-        html += f'<td style="border: 1px solid #555; padding: 4px 8px;">{tipo}</td>'
+        # Tipo - truncar se necessário
+        tipo = field.data_type[:w_tipo-2] + ".." if len(field.data_type) > w_tipo else field.data_type
+        c3 = tipo.ljust(w_tipo)
         
         # Null
-        nullable = "" if field.is_nullable else "NOT NULL"
-        html += f'<td style="border: 1px solid #555; padding: 4px 8px; text-align: center; font-size: 10px;">{nullable}</td>'
+        if field.is_nullable:
+            c4 = "".center(w_null)
+        else:
+            c4 = "NOT NULL".center(w_null)
         
-        html += '</tr>'
+        lines.append(f"│{c1}│{c2}│{c3}│{c4}│")
     
     # Indicador de mais campos
     if len(table.fields) > max_fields:
-        html += '<tr>'
-        html += f'<td colspan="4" style="border: 1px solid #555; padding: 4px 8px; text-align: center; font-style: italic;">... +{len(table.fields) - max_fields} campos</td>'
-        html += '</tr>'
+        more_text = f"... +{len(table.fields) - max_fields} campos"
+        lines.append(f"├{'─' * w_pk}┴{'─' * w_campo}┴{'─' * w_tipo}┴{'─' * w_null}┤")
+        lines.append(f"│ {more_text:^{w_pk + w_campo + w_tipo + w_null + 2}} │")
     
     # Placeholder se não houver campos
     if not fields_to_show:
-        html += '<tr>'
-        html += '<td colspan="4" style="border: 1px solid #555; padding: 8px; text-align: center; font-style: italic;">(nenhum campo)</td>'
-        html += '</tr>'
+        lines.append(f"│ {'(nenhum campo)':^{w_pk + w_campo + w_tipo + w_null + 2}} │")
     
-    html += '</table>'
-    html += '</div>'
+    # Linha final
+    lines.append(f"└{'─' * w_pk}┴{'─' * w_campo}┴{'─' * w_tipo}┴{'─' * w_null}┘")
     
-    return html
+    return "\n".join(lines)
 
 
 def render_diagram(
@@ -116,7 +123,7 @@ def render_diagram(
         node = Node(
             id=table_name,
             label=create_table_label(table),
-            size=500,
+            size=450,
             color={
                 "background": color,
                 "border": border_color,
@@ -127,10 +134,10 @@ def render_diagram(
             },
             shape="box",
             font={
-                "size": 12, 
+                "size": 11, 
                 "color": "#FFFFFF", 
-                "face": "Arial, sans-serif",
-                "multi": "html",  # Habilita suporte a HTML
+                "face": "Courier New, monospace",  # Fonte monoespaçada para bordas
+                "multi": "md",  # Markdown ao invés de HTML
                 "align": "left",
                 "vadjust": 0
             },
@@ -138,9 +145,9 @@ def render_diagram(
             y=table.position_y * config['zoom'],
             borderWidth=2,
             borderWidthSelected=3,
-            widthConstraint={"minimum": 500, "maximum": 500},
-            heightConstraint={"minimum": 150},
-            margin={"top": 8, "bottom": 8, "left": 8, "right": 8}
+            widthConstraint={"minimum": 450, "maximum": 450},
+            heightConstraint={"minimum": 120},
+            margin={"top": 10, "bottom": 10, "left": 10, "right": 10}
         )
         nodes.append(node)
     
