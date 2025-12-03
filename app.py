@@ -155,12 +155,33 @@ with st.sidebar:
                 key="rel_type"
             )
             
+            # Campos das tabelas selecionadas
+            col1, col2 = st.columns(2)
+            with col1:
+                from_fields = [""] + [f.name for f in st.session_state.data_model.tables[from_table].fields]
+                from_field = st.selectbox(
+                    f"Campo de {from_table}",
+                    from_fields,
+                    key="rel_from_field",
+                    help="Campo que se relaciona"
+                )
+            with col2:
+                to_fields = [""] + [f.name for f in st.session_state.data_model.tables[to_table].fields]
+                to_field = st.selectbox(
+                    f"Campo de {to_table}",
+                    to_fields,
+                    key="rel_to_field",
+                    help="Campo relacionado"
+                )
+            
             if st.button("🔗 Adicionar Relacionamento", type="primary", use_container_width=True):
                 if from_table != to_table:
                     rel = Relationship(
                         from_table=from_table,
                         to_table=to_table,
-                        relationship_type=RelationshipType(rel_type)
+                        relationship_type=RelationshipType(rel_type),
+                        from_field=from_field if from_field else None,
+                        to_field=to_field if to_field else None
                     )
                     st.session_state.data_model.add_relationship(rel)
                     st.success("✅ Relacionamento criado!")
@@ -409,7 +430,10 @@ with detail_col:
             for rel in st.session_state.data_model.relationships:
                 col_rel, col_del = st.columns([4, 1])
                 with col_rel:
-                    st.markdown(f"**{rel.from_table}** → **{rel.to_table}**  \n`{rel.relationship_type.value}`")
+                    rel_text = f"**{rel.from_table}** → **{rel.to_table}**  \n`{rel.relationship_type.value}`"
+                    if rel.from_field and rel.to_field:
+                        rel_text += f"  \n🔗 `{rel.from_field}:{rel.to_field}`"
+                    st.markdown(rel_text)
                 with col_del:
                     if st.button("🗑️", key=f"del_rel_{rel.from_table}_{rel.to_table}", help="Remover"):
                         st.session_state.data_model.remove_relationship(rel.from_table, rel.to_table)

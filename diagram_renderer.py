@@ -4,7 +4,7 @@ Renderizador de diagramas para visualização de modelos de dados
 
 import streamlit as st
 from streamlit_agraph import agraph, Node, Edge, Config
-from models import DataModel, Table, RelationshipType
+from models import DataModel, Table, RelationshipType, Relationship
 from typing import Optional, Dict, List
 
 
@@ -19,9 +19,18 @@ def get_relationship_color(rel_type: RelationshipType) -> str:
     return colors.get(rel_type, "#1DB954")
 
 
-def get_relationship_label(rel_type: RelationshipType) -> str:
-    """Retorna o label do relacionamento"""
-    return rel_type.value
+def get_relationship_label(relationship: 'Relationship') -> str:
+    """
+    Retorna o label do relacionamento incluindo os campos
+    Formato: tipo_relacao (campo_origem:campo_destino)
+    """
+    label = relationship.relationship_type.value
+    
+    # Adicionar campos se disponíveis
+    if relationship.from_field and relationship.to_field:
+        label += f"\n({relationship.from_field}:{relationship.to_field})"
+    
+    return label
 
 
 def create_table_label(table: Table) -> str:
@@ -169,7 +178,7 @@ def render_diagram(
         edge = Edge(
             source=rel.from_table,
             target=rel.to_table,
-            label=get_relationship_label(rel.relationship_type),
+            label=get_relationship_label(rel),  # Passa o objeto relationship completo
             color=get_relationship_color(rel.relationship_type),
             width=3,
             arrows="to",
@@ -180,13 +189,14 @@ def render_diagram(
                 "roundness": 0.2     # Curvatura moderada
             },
             font={
-                "size": 14,
+                "size": 12,
                 "color": "#FFFFFF",
                 "background": "#121212",
                 "strokeWidth": 2,
                 "strokeColor": "#121212",
-                "align": "horizontal",
-                "bold": True
+                "align": "top",
+                "bold": True,
+                "multi": True  # Permitir múltiplas linhas
             }
         )
         edges.append(edge)
