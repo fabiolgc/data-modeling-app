@@ -41,6 +41,20 @@ st.markdown("""
         padding-bottom: 1rem;
     }
     
+    /* Remover elementos vazios que aparecem antes do diagrama */
+    .main [data-testid="column"] > div:empty {
+        display: none !important;
+    }
+    
+    .main .element-container:empty {
+        display: none !important;
+    }
+    
+    /* Remover espaçamentos extras antes do diagrama */
+    .diagram-panel::before {
+        display: none !important;
+    }
+    
     /* Melhorar legibilidade de badges */
     .stMarkdown code {
         background-color: rgba(29, 185, 84, 0.1);
@@ -54,16 +68,22 @@ st.markdown("""
     .diagram-panel {
         border: 1px solid rgba(29, 185, 84, 0.3) !important;
         border-radius: 8px !important;
-        padding: 1rem !important;
-        background-color: rgba(18, 18, 18, 0.5) !important;
+        padding: 0 !important;
+        background-color: transparent !important;
+        overflow: hidden !important;
     }
     
-    /* Adicionar borda no elemento que contém o iframe do diagrama */
-    [data-testid="column"]:first-child .element-container:has(iframe) {
-        border: 1px solid rgba(29, 185, 84, 0.3);
-        border-radius: 8px;
-        padding: 1rem;
-        background-color: rgba(18, 18, 18, 0.5);
+    /* Remover qualquer espaçamento extra no container do diagrama */
+    .diagram-panel > div {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Ajustar iframe para não cortar bordas */
+    .diagram-panel iframe {
+        border-radius: 8px !important;
+        display: block !important;
+        margin: 0 !important;
     }
     
     /* Ocultar controles de zoom/reset do Mermaid */
@@ -284,9 +304,7 @@ main_col, detail_col = st.columns([2.5, 1], gap="large")
 # Coluna principal - Diagrama
 with main_col:
     if st.session_state.data_model.tables:
-        st.subheader("📊 Diagrama de Relacionamento (ERD)")
-        
-        # Container com borda para o diagrama
+        # Container com borda para o diagrama (sem título acima)
         st.markdown('<div class="diagram-panel">', unsafe_allow_html=True)
         
         render_diagram(
@@ -297,10 +315,11 @@ with main_col:
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Seletor de tabela manual (já que Mermaid não tem interatividade)
+        # Seletor de tabela manual abaixo do diagrama
         if len(st.session_state.data_model.tables) > 0:
-            st.caption("👇 Selecione uma tabela para ver/editar detalhes:")
-            table_names = [""] + list(st.session_state.data_model.tables.keys())
+            st.markdown("---")
+            st.caption("📋 Selecione uma tabela para ver/editar detalhes:")
+            table_names = ["(Nenhuma selecionada)"] + list(st.session_state.data_model.tables.keys())
             selected = st.selectbox(
                 "Selecionar tabela",
                 table_names,
@@ -308,8 +327,11 @@ with main_col:
                 key="table_selector",
                 label_visibility="collapsed"
             )
-            if selected and selected != st.session_state.selected_table:
+            if selected and selected != "(Nenhuma selecionada)" and selected != st.session_state.selected_table:
                 st.session_state.selected_table = selected
+                st.rerun()
+            elif selected == "(Nenhuma selecionada)" and st.session_state.selected_table:
+                st.session_state.selected_table = None
                 st.rerun()
         
         # Mostrar DDL gerado

@@ -109,17 +109,29 @@ def render_diagram(
         <head>
             <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
             <style>
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
                 body {{
                     margin: 0;
-                    padding: 20px;
+                    padding: 10px;
                     background-color: #121212;
                     display: flex;
                     justify-content: center;
                     align-items: flex-start;
                     min-height: 100vh;
+                    overflow: auto;
                 }}
                 .mermaid {{
                     background-color: transparent;
+                    width: 100%;
+                    max-width: 100%;
+                }}
+                svg {{
+                    max-width: 100% !important;
+                    height: auto !important;
                 }}
                 /* Ocultar controles de zoom/reset */
                 svg > g > g:first-of-type {{
@@ -144,7 +156,8 @@ def render_diagram(
                         tertiaryColor: '#121212'
                     }},
                     er: {{
-                        useMaxWidth: true
+                        useMaxWidth: true,
+                        diagramPadding: 10
                     }}
                 }});
             </script>
