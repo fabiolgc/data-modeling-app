@@ -24,7 +24,7 @@ data-modeling/
 │   └── config.toml          # Configuração de tema Streamlit
 ├── app.py                   # Aplicação principal (simplificada)
 ├── models.py                # Modelos de dados
-├── diagram_renderer.py      # Renderização de diagramas (cores Spotify)
+├── diagram_renderer.py      # Renderização de diagramas (Mermaid ERD)
 ├── sql_generator.py         # Geração de SQL DDL
 ├── requirements.txt         # Dependências Python
 └── README.md               # Este arquivo
@@ -71,12 +71,13 @@ A aplicação será aberta automaticamente no navegador em `http://localhost:850
 - **Centralizar**: Centralize o diagrama na tela
 - **Limpar Modelo**: Remova todas as tabelas e relacionamentos
 
-### 📊 Diagrama Interativo
-- **Visualização**: Diagrama de relacionamento em grafo
-- **Interativo**: Clique nas tabelas para ver/editar detalhes
-- **Arrastar**: Mova tabelas pelo diagrama
-- **Zoom**: Use a roda do mouse para zoom
-- **Pan**: Arraste o fundo para mover a visualização
+### 📊 Diagrama ERD (Entity Relationship Diagram)
+- **Visualização profissional**: Diagrama ERD padrão usando Mermaid
+- **Formato padrão**: Sintaxe Mermaid reconhecida universalmente
+- **Campos visíveis**: Todos os campos e constraints mostrados
+- **Relacionamentos claros**: Símbolos padrão (|o--o|, |o--o{, etc.)
+- **Labels informativos**: Tipo de relação e campos relacionados
+- **Exportável**: Código Mermaid pode ser usado em documentação
 
 ## 🎯 Diferenças da versão anterior
 
@@ -116,7 +117,7 @@ Referência completa: https://docs.streamlit.io/develop/concepts/configuration/t
 ## 📦 Dependências
 
 - `streamlit >= 1.30.0` - Framework web
-- `streamlit-agraph >= 0.0.45` - Visualização de grafos
+- `streamlit-mermaid >= 1.0.0` - Diagramas ERD com Mermaid
 - `pandas` - Manipulação de dados
 
 ## 🔧 Desenvolvimento

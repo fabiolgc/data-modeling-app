@@ -2,6 +2,39 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2.1.0] - 2025-12-03
+
+### 🎨 Mudança: Migração para Mermaid ERD
+
+#### Adicionado
+- **Mermaid ERD**: Substituído `streamlit-agraph` por `streamlit-mermaid`
+- **Diagramas padrão**: ERD (Entity Relationship Diagram) com sintaxe Mermaid
+- **Campos nos relacionamentos**: Labels mostram os campos relacionados (ex: `id:cliente_id`)
+- **Seletor de campos**: UI para especificar quais campos se relacionam
+- **Sintaxe universal**: Código Mermaid pode ser usado em docs, GitHub, etc.
+
+#### Modificado
+- ✏️ **diagram_renderer.py**: Reescrito para gerar sintaxe Mermaid ERD
+- ✏️ **app.py**: Seleção de tabela via selectbox ao invés de clique
+- ✏️ **requirements.txt**: `streamlit-mermaid` ao invés de `streamlit-agraph`
+- ✏️ **Configurações**: Removido zoom (não aplicável em Mermaid)
+
+#### Removido
+- ❌ `streamlit-agraph` e dependências
+- ❌ Interatividade de arrastar e zoom
+- ❌ Controles manuais de posição de nós
+
+### 📊 Vantagens do Mermaid
+
+| Aspecto | agraph (v1.x) | Mermaid (v2.1) |
+|---------|---------------|----------------|
+| Tipo de diagrama | Grafo genérico | ERD padrão |
+| Sintaxe | Python Node/Edge | Mermaid text |
+| Campos na tabela | Texto formatado | ERD nativo |
+| Relacionamentos | Linhas customizadas | Símbolos padrão |
+| Exportar | JSON | Mermaid code |
+| Documentação | Limitada | GitHub, GitLab, docs |
+
 ## [2.0.0] - 2025-12-02
 
 ### 🎨 Mudança Major: Migração para Streamlit Native Theming

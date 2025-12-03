@@ -232,25 +232,13 @@ with st.sidebar:
     
     # TAB: CONFIGURAÇÕES
     elif tab == "⚙️ Configurações":
-        st.subheader("Diagrama")
+        st.subheader("Configurações")
         
-        zoom_level = st.slider(
-            "Zoom",
-            min_value=0.5,
-            max_value=2.0,
-            value=st.session_state.diagram_config['zoom'],
-            step=0.1
-        )
-        st.session_state.diagram_config['zoom'] = zoom_level
-        
-        if st.button("🎯 Centralizar Diagrama", use_container_width=True):
-            st.session_state.diagram_config['center_x'] = 400
-            st.session_state.diagram_config['center_y'] = 300
-            st.success("✅ Diagrama centralizado!")
-            st.rerun()
+        st.info("ℹ️ O diagrama Mermaid ERD é renderizado automaticamente com layout otimizado.")
         
         st.divider()
         
+        st.subheader("Gerenciar Modelo")
         if st.button("🗑️ Limpar Modelo", type="secondary", use_container_width=True):
             if st.checkbox("⚠️ Confirmar limpeza?"):
                 st.session_state.data_model = DataModel()
@@ -264,12 +252,12 @@ main_col, detail_col = st.columns([2.5, 1], gap="large")
 # Coluna principal - Diagrama
 with main_col:
     if st.session_state.data_model.tables:
-        st.subheader("📊 Diagrama de Relacionamento")
+        st.subheader("📊 Diagrama de Relacionamento (ERD)")
         
         # Container com borda para o diagrama
         st.markdown('<div class="diagram-panel">', unsafe_allow_html=True)
         
-        selected = render_diagram(
+        render_diagram(
             st.session_state.data_model,
             st.session_state.diagram_config,
             st.session_state.selected_table
@@ -277,9 +265,20 @@ with main_col:
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        if selected and selected != st.session_state.selected_table:
-            st.session_state.selected_table = selected
-            st.rerun()
+        # Seletor de tabela manual (já que Mermaid não tem interatividade)
+        if len(st.session_state.data_model.tables) > 0:
+            st.caption("👇 Selecione uma tabela para ver/editar detalhes:")
+            table_names = [""] + list(st.session_state.data_model.tables.keys())
+            selected = st.selectbox(
+                "Selecionar tabela",
+                table_names,
+                index=0 if not st.session_state.selected_table else table_names.index(st.session_state.selected_table) if st.session_state.selected_table in table_names else 0,
+                key="table_selector",
+                label_visibility="collapsed"
+            )
+            if selected and selected != st.session_state.selected_table:
+                st.session_state.selected_table = selected
+                st.rerun()
         
         # Mostrar DDL gerado
         if 'generated_ddl' in st.session_state and st.session_state.generated_ddl:
