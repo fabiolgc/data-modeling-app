@@ -27,76 +27,85 @@ def get_relationship_label(rel_type: RelationshipType) -> str:
 def create_table_label(table: Table) -> str:
     """
     Cria o label para uma tabela em formato simples e limpo
-    Usa apenas caracteres ASCII básicos para garantir compatibilidade
+    Usa espaços fixos para garantir alinhamento perfeito
     """
     # Limita o número de campos mostrados no diagrama
     max_fields = 8
     fields_to_show = table.fields[:max_fields]
     
-    # Larguras das colunas
-    w_pk = 6      # PK/FK
-    w_campo = 18  # Campo
-    w_tipo = 10   # Tipo
-    w_null = 8    # Null
+    # Larguras fixas das colunas (em caracteres)
+    w_pk = 5       # PK/FK
+    sp1 = 3        # Espaçamento 1
+    w_campo = 20   # Campo
+    sp2 = 3        # Espaçamento 2
+    w_tipo = 12    # Tipo
+    sp3 = 3        # Espaçamento 3
+    w_null = 8     # Null
+    
+    total_width = w_pk + sp1 + w_campo + sp2 + w_tipo + sp3 + w_null
     
     lines = []
     
     # Nome da tabela com borda
-    total_width = w_pk + w_campo + w_tipo + w_null + 9
     lines.append("=" * total_width)
-    lines.append(f" {table.name.upper():^{total_width-2}} ")
+    nome_centralizado = table.name.upper().center(total_width)
+    lines.append(nome_centralizado)
     lines.append("=" * total_width)
     
-    # Cabeçalho
-    h1 = "PK/FK".rjust(w_pk)
-    h2 = "Campo".ljust(w_campo)
-    h3 = "Tipo".ljust(w_tipo)
-    h4 = "Null".center(w_null)
-    lines.append(f"{h1} | {h2} | {h3} | {h4}")
+    # Cabeçalho - cada coluna com largura fixa
+    h_pk = "PK/FK".ljust(w_pk)
+    h_campo = "Campo".ljust(w_campo)
+    h_tipo = "Tipo".ljust(w_tipo)
+    h_null = "Null".ljust(w_null)
+    header = h_pk + (" " * sp1) + h_campo + (" " * sp2) + h_tipo + (" " * sp3) + h_null
+    lines.append(header)
     lines.append("-" * total_width)
     
     # Linhas de dados
     for field in fields_to_show:
-        # PK/FK - alinhado à direita
+        # Coluna 1: PK/FK (5 chars, alinhado à direita)
         if field.is_primary_key:
             pk_fk = "PK"
         elif field.is_foreign_key:
             pk_fk = "FK"
         else:
             pk_fk = ""
-        c1 = pk_fk.rjust(w_pk)
+        c_pk = (" " * (w_pk - len(pk_fk))) + pk_fk
         
-        # Campo - truncar se necessário
-        if len(field.name) > w_campo - 2:
-            campo = field.name[:w_campo-2] + ".."
+        # Coluna 2: Campo (20 chars, alinhado à esquerda)
+        if len(field.name) > w_campo:
+            campo_text = field.name[:w_campo-2] + ".."
         else:
-            campo = field.name
-        c2 = campo.ljust(w_campo)
+            campo_text = field.name
+        c_campo = campo_text + (" " * (w_campo - len(campo_text)))
         
-        # Tipo - truncar se necessário
-        if len(field.data_type) > w_tipo - 2:
-            tipo = field.data_type[:w_tipo-2] + ".."
+        # Coluna 3: Tipo (12 chars, alinhado à esquerda)
+        if len(field.data_type) > w_tipo:
+            tipo_text = field.data_type[:w_tipo-2] + ".."
         else:
-            tipo = field.data_type
-        c3 = tipo.ljust(w_tipo)
+            tipo_text = field.data_type
+        c_tipo = tipo_text + (" " * (w_tipo - len(tipo_text)))
         
-        # Null
+        # Coluna 4: Null (8 chars, alinhado à esquerda)
         if field.is_nullable:
-            c4 = "".center(w_null)
+            null_text = ""
         else:
-            c4 = "NOT NULL".center(w_null)
+            null_text = "NOT NULL"
+        c_null = null_text + (" " * (w_null - len(null_text)))
         
-        lines.append(f"{c1} | {c2} | {c3} | {c4}")
+        # Montar linha completa
+        linha = c_pk + (" " * sp1) + c_campo + (" " * sp2) + c_tipo + (" " * sp3) + c_null
+        lines.append(linha)
     
     # Indicador de mais campos
     if len(table.fields) > max_fields:
         lines.append("-" * total_width)
         more_text = f"... +{len(table.fields) - max_fields} mais campos"
-        lines.append(f"{more_text:^{total_width}}")
+        lines.append(more_text.center(total_width))
     
     # Placeholder se não houver campos
     if not fields_to_show:
-        lines.append(f"{'(nenhum campo)':^{total_width}}")
+        lines.append("(nenhum campo)".center(total_width))
     
     # Linha final
     lines.append("=" * total_width)
