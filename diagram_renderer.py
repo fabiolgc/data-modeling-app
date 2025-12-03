@@ -26,37 +26,34 @@ def get_relationship_label(rel_type: RelationshipType) -> str:
 
 def create_table_label(table: Table) -> str:
     """
-    Cria o label para uma tabela em formato de texto com bordas usando caracteres box-drawing
-    Simula uma tabela com bordas visíveis
+    Cria o label para uma tabela em formato simples e limpo
+    Usa apenas caracteres ASCII básicos para garantir compatibilidade
     """
     # Limita o número de campos mostrados no diagrama
     max_fields = 8
     fields_to_show = table.fields[:max_fields]
     
     # Larguras das colunas
-    w_pk = 8      # PK/FK
-    w_campo = 20  # Campo
-    w_tipo = 12   # Tipo
+    w_pk = 6      # PK/FK
+    w_campo = 18  # Campo
+    w_tipo = 10   # Tipo
     w_null = 8    # Null
     
     lines = []
     
-    # Nome da tabela
-    lines.append(f"┌{'─' * (w_pk + w_campo + w_tipo + w_null + 6)}┐")
-    lines.append(f"│ {table.name.upper():^{w_pk + w_campo + w_tipo + w_null + 4}} │")
-    
-    # Linha separadora após o nome
-    lines.append(f"├{'─' * w_pk}┬{'─' * w_campo}┬{'─' * w_tipo}┬{'─' * w_null}┤")
+    # Nome da tabela com borda
+    total_width = w_pk + w_campo + w_tipo + w_null + 9
+    lines.append("=" * total_width)
+    lines.append(f" {table.name.upper():^{total_width-2}} ")
+    lines.append("=" * total_width)
     
     # Cabeçalho
-    h1 = "PK/FK".center(w_pk)
+    h1 = "PK/FK".rjust(w_pk)
     h2 = "Campo".ljust(w_campo)
     h3 = "Tipo".ljust(w_tipo)
     h4 = "Null".center(w_null)
-    lines.append(f"│{h1}│{h2}│{h3}│{h4}│")
-    
-    # Linha separadora após cabeçalho
-    lines.append(f"├{'─' * w_pk}┼{'─' * w_campo}┼{'─' * w_tipo}┼{'─' * w_null}┤")
+    lines.append(f"{h1} | {h2} | {h3} | {h4}")
+    lines.append("-" * total_width)
     
     # Linhas de dados
     for field in fields_to_show:
@@ -70,11 +67,17 @@ def create_table_label(table: Table) -> str:
         c1 = pk_fk.rjust(w_pk)
         
         # Campo - truncar se necessário
-        campo = field.name[:w_campo-2] + ".." if len(field.name) > w_campo else field.name
+        if len(field.name) > w_campo - 2:
+            campo = field.name[:w_campo-2] + ".."
+        else:
+            campo = field.name
         c2 = campo.ljust(w_campo)
         
         # Tipo - truncar se necessário
-        tipo = field.data_type[:w_tipo-2] + ".." if len(field.data_type) > w_tipo else field.data_type
+        if len(field.data_type) > w_tipo - 2:
+            tipo = field.data_type[:w_tipo-2] + ".."
+        else:
+            tipo = field.data_type
         c3 = tipo.ljust(w_tipo)
         
         # Null
@@ -83,20 +86,20 @@ def create_table_label(table: Table) -> str:
         else:
             c4 = "NOT NULL".center(w_null)
         
-        lines.append(f"│{c1}│{c2}│{c3}│{c4}│")
+        lines.append(f"{c1} | {c2} | {c3} | {c4}")
     
     # Indicador de mais campos
     if len(table.fields) > max_fields:
-        more_text = f"... +{len(table.fields) - max_fields} campos"
-        lines.append(f"├{'─' * w_pk}┴{'─' * w_campo}┴{'─' * w_tipo}┴{'─' * w_null}┤")
-        lines.append(f"│ {more_text:^{w_pk + w_campo + w_tipo + w_null + 2}} │")
+        lines.append("-" * total_width)
+        more_text = f"... +{len(table.fields) - max_fields} mais campos"
+        lines.append(f"{more_text:^{total_width}}")
     
     # Placeholder se não houver campos
     if not fields_to_show:
-        lines.append(f"│ {'(nenhum campo)':^{w_pk + w_campo + w_tipo + w_null + 2}} │")
+        lines.append(f"{'(nenhum campo)':^{total_width}}")
     
     # Linha final
-    lines.append(f"└{'─' * w_pk}┴{'─' * w_campo}┴{'─' * w_tipo}┴{'─' * w_null}┘")
+    lines.append("=" * total_width)
     
     return "\n".join(lines)
 
